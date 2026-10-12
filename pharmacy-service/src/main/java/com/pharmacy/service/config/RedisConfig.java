@@ -1,6 +1,7 @@
 package com.pharmacy.service.config;
 
 import java.time.Duration;
+import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,27 +20,30 @@ public class RedisConfig {
     public RedisCacheManager cacheManager(
             RedisConnectionFactory connectionFactory) {
 
-        RedisCacheConfiguration config =
+        RedisCacheConfiguration defaultConfig =
                 RedisCacheConfiguration.defaultCacheConfig()
-                        // Key được lưu dưới dạng String
                         .serializeKeysWith(
                                 RedisSerializationContext.SerializationPair
                                         .fromSerializer(
                                                 new StringRedisSerializer()
                                         )
                         )
-                        // Value được serialize thành JSON
                         .serializeValuesWith(
                                 RedisSerializationContext.SerializationPair
                                         .fromSerializer(
                                                 new GenericJackson2JsonRedisSerializer()
                                         )
                         )
-                        // Cache tự hết hạn sau 10 phút
-                        .entryTtl(Duration.ofMinutes(10));
+                        .entryTtl(Duration.ofMinutes(60));
+
+        RedisCacheConfiguration medicinesConfig =
+                defaultConfig.entryTtl(Duration.ofMinutes(60));
 
         return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(config)
+                .cacheDefaults(defaultConfig)
+                .withInitialCacheConfigurations(
+                        Map.of("medicines", medicinesConfig)
+                )
                 .build();
     }
 }

@@ -2,6 +2,8 @@ package com.pharmacy.service.controller;
 
 import com.pharmacy.service.entity.Medicine;
 import com.pharmacy.service.service.MedicineService;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,5 +28,17 @@ public class MedicineController {
         Medicine medicine = medicineService.getMedicineById(id);
 
         return ResponseEntity.ok(medicine);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Medicine> updateMedicine(
+            @PathVariable Long id,
+            @RequestBody Medicine medicine) {
+
+        medicine.setId(id);
+
+        Medicine updatedMedicine =
+                medicineService.updateMedicine(medicine);
+
+        return ResponseEntity.ok(updatedMedicine);
     }
 }
